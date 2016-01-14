@@ -27,6 +27,8 @@ empty :: forall a. IntMap a
 singleton :: forall a. Int -> a -> IntMap a
 ```
 
+An `IntMap` of a single value.
+
 #### `lookup`
 
 ``` purescript
@@ -51,6 +53,12 @@ insertWith :: forall a. (a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 insertWithKey :: forall a. (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 ```
 
+#### `mergeWith`
+
+``` purescript
+mergeWith :: forall a. (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
+```
+
 #### `mergeLeft`
 
 ``` purescript
@@ -61,12 +69,6 @@ mergeLeft :: forall a. IntMap a -> IntMap a -> IntMap a
 
 ``` purescript
 mergeRight :: forall a. IntMap a -> IntMap a -> IntMap a
-```
-
-#### `mergeWith`
-
-``` purescript
-mergeWith :: forall a. (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 ```
 
 #### `mergeWithKey`
@@ -80,5 +82,7 @@ mergeWithKey :: forall a. (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap
 ``` purescript
 mapWithKey :: forall a b. (Int -> a -> b) -> IntMap a -> IntMap b
 ```
+
+Transform all of the values in the map.
 
 
