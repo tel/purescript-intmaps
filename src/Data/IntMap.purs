@@ -1,6 +1,6 @@
 
 -- | An efficient implementation of purely functional maps from integer keys to
--- values.
+-- values. To be imported qualified.
 -- 
 -- Based on the Haskell strict IntMap implementation which is based on
 -- "big-endian patricia trees".
@@ -13,16 +13,21 @@
 module Data.IntMap ( 
 
     IntMap ()
+
   , empty
   , singleton
+
   , lookup
+
   , insert
-  , insertWithKey
   , insertWith
+  , insertWithKey
+
+  , mergeWith
   , mergeLeft
   , mergeRight
   , mergeWithKey
-  , mergeWith
+
   , mapWithKey
 
   ) where
@@ -36,6 +41,7 @@ import           Prelude
 -- Type definition (not exported)
 ----------------------------------------------------------------------------
 
+-- | `IntMap a` is the type of finite maps from integers to values at type `a`.
 data IntMap a 
   = Empty
   | Lf Int a
@@ -65,12 +71,16 @@ instance intMapEq :: (Eq a) => Eq (IntMap a) where
 -- Public API
 ----------------------------------------------------------------------------
 
+-- | The empty `IntMap`
 empty :: forall a . IntMap a
 empty = Empty
 
+-- | An `IntMap` of a single value.
 singleton :: forall a . Int -> a -> IntMap a
 singleton k a = Lf k a
 
+-- | If a value is available in an `IntMap` at a given tree then `lookup`
+-- will return it. Otherwise, `Nothing`.
 lookup :: forall a . Int -> IntMap a -> Maybe a
 lookup _ Empty = Nothing
 lookup k (Lf here v)
@@ -81,12 +91,25 @@ lookup k (Br prefix m l r)
   | branchLeft m k = lookup k l
   | otherwise = lookup k r
 
+-- | Update an `IntMap` by ensuring that a given value exists at a given 
+-- key such that for any `IntMap` `m` and integer `k`, 
+--
+--     lookup k (insert k a) = Just a
+--
 insert :: forall a . Int -> a -> IntMap a -> IntMap a
 insert = insertWithKey (\_ a _ -> a) 
 
+-- | Like `insert` but if the value already exists in the `IntMap` then it is
+-- combined with the new one using a splatting function. The first argument is
+-- the previous value if it exists and the second the new one.
+--
+--     lookup k (insertWith s k a (insert k b m)) = Just (s b a)
+--
 insertWith :: forall a . (a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 insertWith splat = insertWithKey (\_ -> splat)
 
+-- | Like `insertWith` but the splatting function also has access to the 
+-- map key where the conflict arose.
 insertWithKey :: forall a . (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 insertWithKey splat k a t = go t where 
   go t =
@@ -102,15 +125,26 @@ insertWithKey splat k a t = go t where
              else Br p m l (go r)
         | otherwise -> join k (Mask 0) (Lf k a) (prefixAsKey p) m t
 
-mergeLeft :: forall a . IntMap a -> IntMap a -> IntMap a
-mergeLeft = mergeWithKey (\_ a _ -> a)
-
-mergeRight :: forall a . IntMap a -> IntMap a -> IntMap a
-mergeRight = mergeWithKey (\_ _ a -> a)
-
+-- | Merges two `IntMap`s together using a splatting function. If 
+-- a key is present in both constituent lists then the resulting 
+-- list will be the splat of the values from each constituent. If the key
+-- was available in only one constituent then it is available unmodified 
+-- in the result.
 mergeWith :: forall a . (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 mergeWith splat = mergeWithKey (\_ -> splat)
 
+-- | Like `mergeWith` but where values from the left constituent always override
+-- values from the right.
+mergeLeft :: forall a . IntMap a -> IntMap a -> IntMap a
+mergeLeft = mergeWithKey (\_ a _ -> a)
+
+-- | Like `mergeWith` but where values from the right constituent always override
+-- values from the left.
+mergeRight :: forall a . IntMap a -> IntMap a -> IntMap a
+mergeRight = mergeWithKey (\_ _ a -> a)
+
+-- | Like `mergeWith` but where the splatting function has access to all of the
+-- keys where conflicts arise.
 mergeWithKey :: forall a . (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 mergeWithKey splat = go where
   go Empty r = r
@@ -143,6 +177,7 @@ mergeWithKey splat = go where
         (prefixAsKey l_p) l_m l
         (prefixAsKey r_p) r_m r
 
+-- | Transform all of the values in the map.
 mapWithKey :: forall a b . (Int -> a -> b) -> IntMap a -> IntMap b
 mapWithKey f = go where
   go m = 
