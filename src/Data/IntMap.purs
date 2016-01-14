@@ -37,6 +37,7 @@ module Data.IntMap (
   , foldMapWithKey
   , foldlWithKey
   , foldrWithKey
+  , traverseWithKey
 
   , fromAssocArray
   , fromAssocArrayWith
@@ -45,10 +46,11 @@ module Data.IntMap (
 
   ) where
 
-import           Data.Foldable        (Foldable, foldl, foldMap)
+import           Data.Foldable        (Foldable, foldMap, foldl)
 import           Data.IntMap.Internal
 import           Data.Maybe
 import           Data.Monoid
+import           Data.Traversable     (Traversable)
 import           Data.Tuple           (Tuple (Tuple))
 import           Prelude
 
@@ -74,9 +76,13 @@ instance intMapFunctor :: Functor IntMap where
   map f = mapWithKey (\_ -> f)
 
 instance intMapFoldable :: Foldable IntMap where
-  foldMap f = foldMapWithKey (\k v -> f v)
-  foldr f = foldrWithKey (\k -> f)
-  foldl f = foldlWithKey (\k -> f)
+  foldMap f = foldMapWithKey (\_ -> f)
+  foldr f = foldrWithKey (\_ -> f)
+  foldl f = foldlWithKey (\_ -> f)
+
+instance intMapTraversable :: Traversable IntMap where
+  traverse f = traverseWithKey (\_ -> f)
+  sequence = traverseWithKey (\_ -> id)
 
 instance intMapEq :: (Eq a) => Eq (IntMap a) where
   eq Empty Empty = true
@@ -256,6 +262,12 @@ null _ = false
 -- | Count the number of values in the `IntMap`
 size :: forall a . IntMap a -> Int
 size = foldl (\c _ -> 1 + c) 0
+
+traverseWithKey :: forall a t b . (Applicative t) => (Int -> a -> t b) -> IntMap a -> t (IntMap b)
+traverseWithKey inj = go where
+  go Empty = pure Empty
+  go (Lf k x) = Lf k <$> inj k x
+  go (Br p m l r) = Br p m <$> go l <*> go r
 
 -- Private functions
 -- ----------------------------------------------------------------------------

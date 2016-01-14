@@ -12,6 +12,7 @@ data IntMap a
 (Semigroup a) => Monoid (IntMap a)
 Functor IntMap
 Foldable IntMap
+Traversable IntMap
 (Eq a) => Eq (IntMap a)
 ```
 
@@ -206,5 +207,11 @@ size :: forall a. IntMap a -> Int
 ```
 
 Count the number of values in the `IntMap`
+
+#### `traverseWithKey`
+
+``` purescript
+traverseWithKey :: forall a t b. (Applicative t) => (Int -> a -> t b) -> IntMap a -> t (IntMap b)
+```
 
 
