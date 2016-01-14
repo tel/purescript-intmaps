@@ -7,6 +7,7 @@ install:
 script:
   - npm run build
 after_success:
+- git stash save
 - >-
   test $TRAVIS_TAG &&
   ./node_modules/.bin/psc-publish > .pursuit.json &&
