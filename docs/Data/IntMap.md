@@ -89,43 +89,43 @@ insertWithKey :: forall a. (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMa
 Like `insertWith` but the splatting function also has access to the 
 map key where the conflict arose.
 
-#### `mergeWith`
+#### `unionWith`
 
 ``` purescript
-mergeWith :: forall a. (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
+unionWith :: forall a. (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 ```
 
-Merges two `IntMap`s together using a splatting function. If 
+Unions two `IntMap`s together using a splatting function. If 
 a key is present in both constituent lists then the resulting 
 list will be the splat of the values from each constituent. If the key
 was available in only one constituent then it is available unmodified 
 in the result.
 
-#### `mergeLeft`
+#### `unionLeft`
 
 ``` purescript
-mergeLeft :: forall a. IntMap a -> IntMap a -> IntMap a
+unionLeft :: forall a. IntMap a -> IntMap a -> IntMap a
 ```
 
-Like `mergeWith` but where values from the left constituent always override
+Like `unionWith` but where values from the left constituent always override
 values from the right.
 
-#### `mergeRight`
+#### `unionRight`
 
 ``` purescript
-mergeRight :: forall a. IntMap a -> IntMap a -> IntMap a
+unionRight :: forall a. IntMap a -> IntMap a -> IntMap a
 ```
 
-Like `mergeWith` but where values from the right constituent always override
+Like `unionWith` but where values from the right constituent always override
 values from the left.
 
-#### `mergeWithKey`
+#### `unionWithKey`
 
 ``` purescript
-mergeWithKey :: forall a. (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
+unionWithKey :: forall a. (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 ```
 
-Like `mergeWith` but where the splatting function has access to all of the
+Like `unionWith` but where the splatting function has access to all of the
 keys where conflicts arise.
 
 #### `mapWithKey`

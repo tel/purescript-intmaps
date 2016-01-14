@@ -30,10 +30,10 @@ module Data.IntMap (
   , insertWith
   , insertWithKey
 
-  , mergeWith
-  , mergeLeft
-  , mergeRight
-  , mergeWithKey
+  , unionWith
+  , unionLeft
+  , unionRight
+  , unionWithKey
 
   , mapWithKey
   , foldMapWithKey
@@ -69,7 +69,7 @@ data IntMap a
 -- ----------------------------------------------------------------------------
 
 instance intMapSemigroup :: (Semigroup a) => Semigroup (IntMap a) where
-  append m1 m2 = mergeWith append m1 m2
+  append m1 m2 = unionWith append m1 m2
 
 instance intMapMonoid :: (Semigroup a) => Monoid (IntMap a) where
   mempty = empty
@@ -164,40 +164,40 @@ insertWithKey splat k a t = go t where
              else Br p m l (go r)
         | otherwise -> join k (Mask 0) (Lf k a) (prefixAsKey p) m t
 
--- | Merges two `IntMap`s together using a splatting function. If 
+-- | Unions two `IntMap`s together using a splatting function. If 
 -- | a key is present in both constituent lists then the resulting 
 -- | list will be the splat of the values from each constituent. If the key
 -- | was available in only one constituent then it is available unmodified 
 -- | in the result.
-mergeWith :: forall a . (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
-mergeWith splat = mergeWithKey (\_ -> splat)
+unionWith :: forall a . (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
+unionWith splat = unionWithKey (\_ -> splat)
 
--- | Like `mergeWith` but where values from the left constituent always override
+-- | Like `unionWith` but where values from the left constituent always override
 -- | values from the right.
-mergeLeft :: forall a . IntMap a -> IntMap a -> IntMap a
-mergeLeft = mergeWithKey (\_ a _ -> a)
+unionLeft :: forall a . IntMap a -> IntMap a -> IntMap a
+unionLeft = unionWithKey (\_ a _ -> a)
 
--- | Like `mergeWith` but where values from the right constituent always override
+-- | Like `unionWith` but where values from the right constituent always override
 -- | values from the left.
-mergeRight :: forall a . IntMap a -> IntMap a -> IntMap a
-mergeRight = mergeWithKey (\_ _ a -> a)
+unionRight :: forall a . IntMap a -> IntMap a -> IntMap a
+unionRight = unionWithKey (\_ _ a -> a)
 
--- | Like `mergeWith` but where the splatting function has access to all of the
+-- | Like `unionWith` but where the splatting function has access to all of the
 -- | keys where conflicts arise.
-mergeWithKey :: forall a . (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
-mergeWithKey splat = go where
+unionWithKey :: forall a . (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
+unionWithKey splat = go where
   go Empty r = r
   go l Empty = l
   go (Lf k a) r = insertWithKey splat k a r
   go l (Lf k a) = insertWithKey (\k a b -> splat k b a) k a l
   go l@(Br l_p l_m l_l l_r) r@(Br r_p r_m r_l r_r)
 
-    -- the prefixes are identical, we'll merge symmetrically
+    -- the prefixes are identical, we'll union symmetrically
     | l_m == r_m && l_p == r_p =
       Br l_p l_m (go l_l r_l) (go l_r r_r)
 
     -- the left mask is longer and the right prefix is a subsequence of the left
-    -- thus, the right tree is more specific and should be merged with some
+    -- thus, the right tree is more specific and should be uniond with some
     -- subtree of the left tree
     | maskLonger l_m r_m && matchPrefix l_p l_m (prefixAsKey r_p) =
       if branchLeft l_m (prefixAsKey r_p)
