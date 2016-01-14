@@ -19,10 +19,12 @@ module Data.IntMap (
 
   , empty
   , singleton
+  , member
   , indices
   , values
 
   , lookup
+  , lookupDefault
 
   , insert
   , insertWith
@@ -102,6 +104,13 @@ empty = Empty
 singleton :: forall a . Int -> a -> IntMap a
 singleton k a = Lf k a
 
+-- | Is a given key in the map?
+member :: forall a . Int -> IntMap a -> Boolean
+member k m = 
+  case lookup k m of
+    Nothing -> false
+    Just _ -> true
+
 -- | If a value is available in an `IntMap` at a given tree then `lookup`
 -- | will return it. Otherwise, `Nothing`.
 lookup :: forall a . Int -> IntMap a -> Maybe a
@@ -113,6 +122,13 @@ lookup k (Br prefix m l r)
   | not (matchPrefix prefix m k) = Nothing
   | branchLeft m k = lookup k l
   | otherwise = lookup k r
+
+-- | Like `lookup` but returning a default value if not available in the `IntMap`
+lookupDefault :: forall a . Int -> a -> IntMap a -> a
+lookupDefault k d m = 
+  case lookup k m of
+    Nothing -> d
+    Just a -> a
 
 -- | Update an `IntMap` by ensuring that a given value exists at a given 
 -- | key such that for any `IntMap` `m` and integer `k`, 

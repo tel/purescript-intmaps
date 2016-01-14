@@ -30,6 +30,14 @@ singleton :: forall a. Int -> a -> IntMap a
 
 An `IntMap` of a single value.
 
+#### `member`
+
+``` purescript
+member :: forall a. Int -> IntMap a -> Boolean
+```
+
+Is a given key in the map?
+
 #### `lookup`
 
 ``` purescript
@@ -38,6 +46,14 @@ lookup :: forall a. Int -> IntMap a -> Maybe a
 
 If a value is available in an `IntMap` at a given tree then `lookup`
 will return it. Otherwise, `Nothing`.
+
+#### `lookupDefault`
+
+``` purescript
+lookupDefault :: forall a. Int -> a -> IntMap a -> a
+```
+
+Like `lookup` but returning a default value if not available in the `IntMap`
 
 #### `insert`
 
