@@ -39,13 +39,16 @@ import           Data.Monoid
 import           Prelude
 
 -- Type definition (not exported)
-----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- | `IntMap a` is the type of finite maps from integers to values at type `a`.
 data IntMap a 
   = Empty
   | Lf Int a
   | Br Prefix Mask (IntMap a) (IntMap a)
+
+-- Instance definitions
+-- ----------------------------------------------------------------------------
 
 instance intMapSemigroup :: (Semigroup a) => Semigroup (IntMap a) where
   append m1 m2 = mergeWith append m1 m2
@@ -69,7 +72,7 @@ instance intMapEq :: (Eq a) => Eq (IntMap a) where
   eq _ _ = false
 
 -- Public API
-----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 -- | The empty `IntMap`
 empty :: forall a . IntMap a
@@ -186,8 +189,11 @@ mapWithKey f = go where
       Lf k a -> Lf k (f k a)
       Br p m l r -> Br p m (go l) (go r)
 
+-- Private data
+-- ----------------------------------------------------------------------------
+
 -- Private functions
-----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
 
 foldMap_ :: forall a m . (Monoid m) => (a -> m) -> IntMap a -> m
 foldMap_ f = go where

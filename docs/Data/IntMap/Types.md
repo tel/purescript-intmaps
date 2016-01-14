@@ -1,3 +1,0 @@
-## Module Data.IntMap.Types
-
-
