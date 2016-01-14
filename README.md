@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/tel/purescript-intmaps.svg?branch=master)](https://travis-ci.org/tel/purescript-intmaps)
 
+[![purescript-intmaps on Pursuit](http://pursuit.purescript.org/packages/purescript-intmaps/badge)](http://pursuit.purescript.org/packages/purescript-intmaps)
+
 Finite maps from integers to arbitrary values. Current implementation is a *big
 endian Patricia tree* which is an efficient binary search tree on (positive)
 integer keys.
