@@ -14,8 +14,13 @@ module Data.IntMap (
 
     IntMap ()
 
+  , null
+  , size
+
   , empty
   , singleton
+  , indices
+  , values
 
   , lookup
 
@@ -29,13 +34,22 @@ module Data.IntMap (
   , mergeWithKey
 
   , mapWithKey
+  , foldMapWithKey
+  , foldlWithKey
+  , foldrWithKey
+
+  , fromAssocArray
+  , fromAssocArrayWith
+  , fromAssocArrayWithKey
+  , toAssocArray
 
   ) where
 
-import           Data.Foldable        (Foldable)
+import           Data.Foldable        (Foldable, foldl, foldMap)
 import           Data.IntMap.Internal
 import           Data.Maybe
 import           Data.Monoid
+import           Data.Tuple           (Tuple (Tuple))
 import           Prelude
 
 -- Type definition (not exported)
@@ -60,9 +74,9 @@ instance intMapFunctor :: Functor IntMap where
   map f = mapWithKey (\_ -> f)
 
 instance intMapFoldable :: Foldable IntMap where
-  foldMap = foldMap_
-  foldr = foldr_
-  foldl = foldl_
+  foldMap f = foldMapWithKey (\k v -> f v)
+  foldr f = foldrWithKey (\k -> f)
+  foldl f = foldlWithKey (\k -> f)
 
 instance intMapEq :: (Eq a) => Eq (IntMap a) where
   eq Empty Empty = true
@@ -189,29 +203,62 @@ mapWithKey f = go where
       Lf k a -> Lf k (f k a)
       Br p m l r -> Br p m (go l) (go r)
 
--- Private data
--- ----------------------------------------------------------------------------
+-- | Construct an `IntMap` from an associative array from integer keys to values
+fromAssocArray :: forall a . Array (Tuple Int a) -> IntMap a
+fromAssocArray = foldl (\m (Tuple k v) -> insert k v m) empty
+
+-- | Construct an `IntMap` from an associative array from integer keys to values
+fromAssocArrayWith :: forall a . (a -> a -> a) -> Array (Tuple Int a) -> IntMap a
+fromAssocArrayWith f = foldl (\m (Tuple k v) -> insertWith f k v m) empty
+
+-- | Construct an `IntMap` from an associative array from integer keys to values
+fromAssocArrayWithKey :: forall a . (Int -> a -> a -> a) -> Array (Tuple Int a) -> IntMap a
+fromAssocArrayWithKey f = foldl (\m (Tuple k v) -> insertWithKey f k v m) empty
+
+-- | Convert an `IntMap` to an equivalent associative array.
+toAssocArray :: forall a . IntMap a -> Array (Tuple Int a)
+toAssocArray = foldMapWithKey (\k v -> pure (Tuple k v))
+
+-- | Gather all of the indicies stored in an `IntMap`
+indices :: forall a . IntMap a -> Array Int
+indices = foldMapWithKey (\k _ -> pure k)
+
+-- | Gather all of the values stored in an `IntMap`
+values :: forall a . IntMap a -> Array a
+values = foldMap pure
+
+-- | A version of `foldMap` which provides key values during the mapping.
+foldMapWithKey :: forall a m . (Monoid m) => (Int -> a -> m) -> IntMap a -> m
+foldMapWithKey f = go where
+  go Empty = mempty
+  go (Lf k x) = f k x
+  go (Br _ _ l r) = go l <> go r
+
+-- | A version of `foldl` which provides key values during the mapping.
+foldlWithKey :: forall a b. (Int -> b -> a -> b) -> b -> IntMap a -> b
+foldlWithKey f = go where
+  go z Empty = z
+  go z (Lf k a) = f k z a
+  go z (Br _ _ l r) = go (go z l) r
+
+-- | A version of `foldr` which provides key values during the mapping.
+foldrWithKey :: forall a b. (Int -> a -> b -> b) -> b -> IntMap a -> b
+foldrWithKey f = go where
+  go z Empty = z
+  go z (Lf k a) = f k a z
+  go z (Br _ _ l r) = go (go z r) l
+
+-- | Checks whether an `IntMap` contains any values at all.
+null :: forall a . IntMap a -> Boolean
+null Empty = true
+null _ = false
+
+-- | Count the number of values in the `IntMap`
+size :: forall a . IntMap a -> Int
+size = foldl (\c _ -> 1 + c) 0
 
 -- Private functions
 -- ----------------------------------------------------------------------------
-
-foldMap_ :: forall a m . (Monoid m) => (a -> m) -> IntMap a -> m
-foldMap_ f = go where
-  go Empty = mempty
-  go (Lf _ x) = f x
-  go (Br _ _ l r) = go l <> go r
-
-foldl_ :: forall a b. (b -> a -> b) -> b -> IntMap a -> b
-foldl_ f = go where
-  go z Empty = z
-  go z (Lf _ a) = f z a
-  go z (Br _ _ l r) = go (go z l) r
-
-foldr_ :: forall a b. (a -> b -> b) -> b -> IntMap a -> b
-foldr_ f = go where
-  go z Empty = z
-  go z (Lf _ a) = f a z
-  go z (Br _ _ l r) = go (go z r) l
 
 -- | Smart branch constructor. Compresses empty trees away.
 br :: forall a . Prefix -> Mask -> IntMap a -> IntMap a -> IntMap a

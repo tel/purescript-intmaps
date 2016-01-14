@@ -119,4 +119,92 @@ mapWithKey :: forall a b. (Int -> a -> b) -> IntMap a -> IntMap b
 
 Transform all of the values in the map.
 
+#### `fromAssocArray`
+
+``` purescript
+fromAssocArray :: forall a. Array (Tuple Int a) -> IntMap a
+```
+
+Construct an `IntMap` from an associative array from integer keys to values
+
+#### `fromAssocArrayWith`
+
+``` purescript
+fromAssocArrayWith :: forall a. (a -> a -> a) -> Array (Tuple Int a) -> IntMap a
+```
+
+Construct an `IntMap` from an associative array from integer keys to values
+
+#### `fromAssocArrayWithKey`
+
+``` purescript
+fromAssocArrayWithKey :: forall a. (Int -> a -> a -> a) -> Array (Tuple Int a) -> IntMap a
+```
+
+Construct an `IntMap` from an associative array from integer keys to values
+
+#### `toAssocArray`
+
+``` purescript
+toAssocArray :: forall a. IntMap a -> Array (Tuple Int a)
+```
+
+Convert an `IntMap` to an equivalent associative array.
+
+#### `indices`
+
+``` purescript
+indices :: forall a. IntMap a -> Array Int
+```
+
+Gather all of the indicies stored in an `IntMap`
+
+#### `values`
+
+``` purescript
+values :: forall a. IntMap a -> Array a
+```
+
+Gather all of the values stored in an `IntMap`
+
+#### `foldMapWithKey`
+
+``` purescript
+foldMapWithKey :: forall a m. (Monoid m) => (Int -> a -> m) -> IntMap a -> m
+```
+
+A version of `foldMap` which provides key values during the mapping.
+
+#### `foldlWithKey`
+
+``` purescript
+foldlWithKey :: forall a b. (Int -> b -> a -> b) -> b -> IntMap a -> b
+```
+
+A version of `foldl` which provides key values during the mapping.
+
+#### `foldrWithKey`
+
+``` purescript
+foldrWithKey :: forall a b. (Int -> a -> b -> b) -> b -> IntMap a -> b
+```
+
+A version of `foldr` which provides key values during the mapping.
+
+#### `null`
+
+``` purescript
+null :: forall a. IntMap a -> Boolean
+```
+
+Checks whether an `IntMap` contains any values at all.
+
+#### `size`
+
+``` purescript
+size :: forall a. IntMap a -> Int
+```
+
+Count the number of values in the `IntMap`
+
 
