@@ -136,7 +136,7 @@ lookupDefault k d m =
 -- |   lookup k (insert k a) = Just a
 -- |
 insert :: forall a . Int -> a -> IntMap a -> IntMap a
-insert = insertWithKey (\_ a _ -> a) 
+insert = insertWithKey (\_ _ a -> a)
 
 -- | Like `insert` but if the value already exists in the `IntMap` then it is
 -- | combined with the new one using a splatting function. The first argument is

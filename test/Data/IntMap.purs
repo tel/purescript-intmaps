@@ -42,4 +42,5 @@ tests = do
       Assert.assert "ex0 /= ex1" (ex0 /= ex1)
       Assert.assert "ex1 /= ex2" (ex1 /= ex2)
       Assert.assert "ex2 /= ex0" (ex2 /= ex0)
+    test "insert overlaps" $ Assert.equal (Just 3) (lookup 0 (insert 0 3 ex1))
     Internal.tests
