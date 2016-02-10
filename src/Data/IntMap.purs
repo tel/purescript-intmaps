@@ -30,6 +30,11 @@ module Data.IntMap (
   , insertWith
   , insertWithKey
 
+  , adjust
+  , adjustWithKey
+  , update
+  , updateWithKey
+
   , unionWith
   , unionLeft
   , unionRight
@@ -163,6 +168,41 @@ insertWithKey splat k a t = go t where
              then Br p m (go l) r
              else Br p m l (go r)
         | otherwise -> join k (Mask 0) (Lf k a) (prefixAsKey p) m t
+
+-- | /O(min(n,W))/. Adjust a value at a specific key. When the key is not
+-- | a member of the map, the original map is returned.
+adjust :: forall a. (a -> a) -> Int -> IntMap a -> IntMap a
+adjust f = adjustWithKey (\_ x -> f x)
+
+-- | /O(min(n,W))/. Adjust a value at a specific key. When the key is not
+-- | a member of the map, the original map is returned.
+adjustWithKey :: forall a. (Int -> a -> a) -> Int -> IntMap a -> IntMap a
+adjustWithKey f = updateWithKey (\k' x -> Just $ f k' x)
+
+-- | /O(min(n,W))/. The expression (@'update' f k map@) updates the value @x@
+-- | at @k@ (if it is in the map). If (@f x@) is 'Nothing', the element is
+-- | deleted. If it is (@'Just' y@), the key @k@ is bound to the new value @y@.
+update :: forall a. (a -> Maybe a) -> Int -> IntMap a -> IntMap a
+update f = updateWithKey (\_ x -> f x)
+
+-- | /O(min(n,W))/. The expression (@'update' f k map@) updates the value @x@
+-- | at @k@ (if it is in the map). If (@f k x@) is 'Nothing', the element is
+-- | deleted. If it is (@'Just' y@), the key @k@ is bound to the new value @y@.
+updateWithKey :: forall a. (Int -> a -> Maybe a) -> Int -> IntMap a -> IntMap a
+updateWithKey f k t = go t where
+  go t =
+    case t of
+      Empty -> Empty
+      Lf ky y
+        | k == ky ->
+          case f k y of
+            Just y' -> Lf ky y'
+            Nothing -> Empty
+        | otherwise -> t
+      Br p m l r
+        | not (matchPrefix p m k) -> t
+        | branchLeft m k -> Br p m (go l) r
+        | otherwise -> Br p m l (go r)
 
 -- | Unions two `IntMap`s together using a splatting function. If 
 -- | a key is present in both constituent lists then the resulting 
