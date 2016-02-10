@@ -54,13 +54,13 @@ module Data.IntMap (
 
   ) where
 
-import           Data.Foldable        (Foldable, foldMap, foldl)
-import           Data.IntMap.Internal
-import           Data.Maybe
-import           Data.Monoid
-import           Data.Traversable     (Traversable)
-import           Data.Tuple           (Tuple (Tuple))
-import           Prelude
+import Data.Foldable (class Foldable, foldMap, foldl)
+import Data.IntMap.Internal (Prefix, Mask(Mask), mask, branchLeft, branchingBit', prefixAsKey, matchPrefix, maskLonger)
+import Data.Maybe (Maybe(Nothing, Just))
+import Data.Monoid (class Monoid, mempty)
+import Data.Traversable (class Traversable)
+import Data.Tuple (Tuple (Tuple))
+import Prelude (class Applicative, class Eq, class Functor, class Semigroup, (<*>), (<$>), pure, (+), (<>), otherwise, (&&), (==), not, ($), eq, id, append)
 
 -- Type definition (not exported)
 -- ----------------------------------------------------------------------------
