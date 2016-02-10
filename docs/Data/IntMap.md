@@ -89,6 +89,53 @@ insertWithKey :: forall a. (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMa
 Like `insertWith` but the splatting function also has access to the 
 map key where the conflict arose.
 
+#### `delete`
+
+``` purescript
+delete :: forall a. Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. Delete a key and its value from map. When the key is not
+a member of the map, the original map is returned.
+
+#### `adjust`
+
+``` purescript
+adjust :: forall a. (a -> a) -> Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. Adjust a value at a specific key. When the key is not
+a member of the map, the original map is returned.
+
+#### `adjustWithKey`
+
+``` purescript
+adjustWithKey :: forall a. (Int -> a -> a) -> Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. Adjust a value at a specific key. When the key is not
+a member of the map, the original map is returned.
+
+#### `update`
+
+``` purescript
+update :: forall a. (a -> Maybe a) -> Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. The expression (@'update' f k map@) updates the value @x@
+at @k@ (if it is in the map). If (@f x@) is 'Nothing', the element is
+deleted. If it is (@'Just' y@), the key @k@ is bound to the new value @y@.
+
+#### `updateWithKey`
+
+``` purescript
+updateWithKey :: forall a. (Int -> a -> Maybe a) -> Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. The expression (@'update' f k map@) updates the value @x@
+at @k@ (if it is in the map). If (@f k x@) is 'Nothing', the element is
+deleted. If it is (@'Just' y@), the key @k@ is bound to the new value @y@.
+
 #### `unionWith`
 
 ``` purescript
