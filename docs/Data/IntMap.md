@@ -1,10 +1,14 @@
 ## Module Data.IntMap
 
+An efficient implementation of purely functional maps from integer keys to
+
 #### `IntMap`
 
 ``` purescript
 data IntMap a
 ```
+
+`IntMap a` is the type of finite maps from integers to values at type `a`.
 
 ##### Instances
 ``` purescript
@@ -21,6 +25,8 @@ Traversable IntMap
 ``` purescript
 empty :: forall a. IntMap a
 ```
+
+The empty `IntMap`
 
 #### `singleton`
 
