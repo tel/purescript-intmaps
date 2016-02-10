@@ -30,6 +30,8 @@ module Data.IntMap (
   , insertWith
   , insertWithKey
 
+  , delete
+
   , unionWith
   , unionLeft
   , unionRight
@@ -163,6 +165,20 @@ insertWithKey splat k a t = go t where
              then Br p m (go l) r
              else Br p m l (go r)
         | otherwise -> join k (Mask 0) (Lf k a) (prefixAsKey p) m t
+
+-- | /O(min(n,W))/. Delete a key and its value from map. When the key is not
+-- | a member of the map, the original map is returned.
+delete :: forall a. Int -> IntMap a -> IntMap a
+delete k t =
+  case t of
+    Empty -> Empty
+    Lf ky _
+      | k==ky -> Empty
+      | otherwise -> t
+    Br p m l r
+      | not (matchPrefix p m k) -> t
+      | branchLeft m k -> Br p m (delete k l) r
+      | otherwise -> Br p m l (delete k r)
 
 -- | Unions two `IntMap`s together using a splatting function. If 
 -- | a key is present in both constituent lists then the resulting 
