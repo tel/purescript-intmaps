@@ -18,6 +18,7 @@ Functor IntMap
 Foldable IntMap
 Traversable IntMap
 (Eq a) => Eq (IntMap a)
+(Show a) => Show (IntMap a)
 ```
 
 #### `empty`
@@ -260,6 +261,22 @@ foldrWithKey :: forall a b. (Int -> a -> b -> b) -> b -> IntMap a -> b
 ```
 
 A version of `foldr` which provides key values during the mapping.
+
+#### `filter`
+
+``` purescript
+filter :: forall a. (a -> Boolean) -> IntMap a -> IntMap a
+```
+
+/O(n)/. Filter all values satisfying the predicate.
+
+#### `filterWithKey`
+
+``` purescript
+filterWithKey :: forall a. (Int -> a -> Boolean) -> IntMap a -> IntMap a
+```
+
+/O(n)/. Filter all keys\/values satysfying the predicate.
 
 #### `null`
 

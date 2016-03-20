@@ -47,6 +47,9 @@ module Data.IntMap (
   , foldrWithKey
   , traverseWithKey
 
+  , filter
+  , filterWithKey
+
   , fromAssocArray
   , fromAssocArrayWith
   , fromAssocArrayWithKey
@@ -60,7 +63,7 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)
 import Data.Tuple (Tuple (Tuple))
-import Prelude (class Applicative, class Eq, class Functor, class Semigroup, (<*>), (<$>), pure, (+), (<>), otherwise, (&&), (==), not, ($), eq, id, append)
+import Prelude (class Applicative, class Eq, class Functor, class Semigroup, class Show, (<*>), (<$>), pure, (+), (<>), show, otherwise, (&&), (==), not, ($), eq, id, append)
 
 -- Type definition (not exported)
 -- ----------------------------------------------------------------------------
@@ -98,6 +101,9 @@ instance intMapEq :: (Eq a) => Eq (IntMap a) where
   eq (Br p1 m1 l1 r1) (Br p2 m2 l2 r2) =
     eq m1 m2 && eq p1 p2 && eq l1 l2 && eq r1 r2
   eq _ _ = false
+
+instance intMapShow :: (Show a) => Show (IntMap a) where
+  show t = "fromAssocArray " <> show (toAssocArray t)
 
 -- Public API
 -- ----------------------------------------------------------------------------
@@ -325,6 +331,20 @@ foldrWithKey f = go where
   go z Empty = z
   go z (Lf k a) = f k a z
   go z (Br _ _ l r) = go (go z r) l
+
+-- | /O(n)/. Filter all values satisfying the predicate.
+filter :: forall a. (a -> Boolean) -> IntMap a -> IntMap a
+filter p = filterWithKey (\_ x -> p x)
+
+-- | /O(n)/. Filter all keys\/values satysfying the predicate.
+filterWithKey :: forall a. (Int -> a -> Boolean) -> IntMap a -> IntMap a
+filterWithKey p t =
+  case t of
+    Br b m l r    -> br b m (filterWithKey p l) (filterWithKey p r)
+    Lf i a
+      | p i a     -> t
+      | otherwise -> Empty
+    otherwise     -> Empty
 
 -- | Checks whether an `IntMap` contains any values at all.
 null :: forall a . IntMap a -> Boolean
