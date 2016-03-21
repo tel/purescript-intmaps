@@ -43,4 +43,10 @@ tests = do
       Assert.assert "ex1 /= ex2" (ex1 /= ex2)
       Assert.assert "ex2 /= ex0" (ex2 /= ex0)
     test "insert overlaps" $ Assert.equal (Just 3) (lookup 0 (insert 0 3 ex1))
+    test "filter none" $
+      Assert.equal ex2 (filter (const true) ex2)
+    test "filter all" $
+      Assert.equal empty (filter (const false) ex2)
+    test "filter by key" $
+      Assert.equal (delete 20 ex2) (filterWithKey (\i _ -> i /= 20) ex2)
     Internal.tests
