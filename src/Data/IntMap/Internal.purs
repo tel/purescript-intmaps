@@ -2,7 +2,7 @@
 module Data.IntMap.Internal where
 
 import Data.Function (Fn2 (), runFn2)
-import Data.Int.Bits ((.^.), complement, (.&.), (.|.))
+import Data.Int.Bits ((.^.), complement, (.&.), (.|.), zshr)
 import Prelude (class Ord, class Eq, (*), (-), otherwise, (==), (<), compare, eq)
 
 -- Newtypes
@@ -56,6 +56,19 @@ branchingBit' k1 (Mask m1) k2 (Mask m2) =
 
 branchingBit :: Int -> Int -> Mask
 branchingBit k1 k2 = branchingBit' k1 (Mask 0) k2 (Mask 0)
+
+branchMask :: Int -> Int -> Mask
+branchMask x1 x2 =
+  Mask (highestBitMask (x1 .^. x2))
+
+highestBitMask :: Int -> Int
+highestBitMask x1 =
+  let x2 = x1 .|. x1 `zshr` 1
+      x3 = x2 .|. x2 `zshr` 2
+      x4 = x3 .|. x3 `zshr` 4
+      x5 = x4 .|. x4 `zshr` 8
+      x6 = x5 .|. x5 `zshr` 16
+  in x6 .^. (x6 `zshr` 1)
 
 foreign import dec2bin :: Int -> String
 foreign import bin2dec :: String -> Int
