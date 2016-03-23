@@ -20,9 +20,12 @@ props = do
 
 tests = do
     test "binary conversions" do
-      Assert.equal "0" (dec2bin 0)
-      Assert.equal (dec2bin $ runFn2 pow 2 32 - 1) (dec2bin (complement 0)) 
-      Assert.equal "11111111111111111111111111111111" (dec2bin $ runFn2 pow 2 32 - 1) 
+      let minInt = (-2147483648)
+          maxInt =   2147483647
+      Assert.equal                                "0" (dec2bin 0)
+      Assert.equal "11111111111111111111111111111111" (dec2bin (-1))
+      Assert.equal "10000000000000000000000000000000" (dec2bin minInt)
+      Assert.equal  "1111111111111111111111111111111" (dec2bin maxInt)
       Assert.equal 0 (bin2dec "000000000")
       Assert.equal 5 (bin2dec "101")
       Assert.equal 90 (bin2dec "01011010")
