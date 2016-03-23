@@ -10,7 +10,7 @@ import           Test.Unit.Assert     as Assert
 import           Test.Unit.QuickCheck (quickCheck)
 import           Test.QuickCheck      (Result (), (===))
 
-testAll = test "Internal" do
+testAll = test "Data.IntMap.Internal" do
   test "QuickCheck" props
   test "Unit Tests" tests
 

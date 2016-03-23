@@ -5,10 +5,14 @@ import           Data.Foldable             (foldMap, foldr, foldl)
 import Data.Array ((:))
 import           Data.IntMap
 import           Data.Maybe
+import Data.Tuple (Tuple(Tuple))
 import           Prelude
 import qualified Test.Data.IntMap.Internal as Internal
 import           Test.Unit                 (Test (), test)
 import           Test.Unit.Assert          as Assert
+import Test.Unit.QuickCheck (quickCheck)
+import Test.QuickCheck (Result(), (===))
+import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 
 (>|) :: forall a b . a -> (a -> b) -> b
 (>|) a f = f a
@@ -26,8 +30,11 @@ ex2 = empty
      >| insert 30 30
      >| insert 0  1234
 
+testAll = test "Data.IntMap" do
+  test "Unit Tests" tests
+  test "QuickCheck" props
+
 tests = do
-  test "Data.IntMap" do 
     test "lookup in empty map" $ Assert.equal Nothing (lookup 0 ex0)
     test "lookup in singleton map" $ Assert.equal (Just 1234) (lookup 0 ex1)
     test "lookup in compound map" $ Assert.equal (Just 1234) (lookup 0 ex2)
@@ -42,10 +49,28 @@ tests = do
       Assert.assert "ex1 /= ex2" (ex1 /= ex2)
       Assert.assert "ex2 /= ex0" (ex2 /= ex0)
     test "insert overlaps" $ Assert.equal (Just 3) (lookup 0 (insert 0 3 ex1))
-    test "filter none" $
-      Assert.equal ex2 (filter (const true) ex2)
-    test "filter all" $
-      Assert.equal empty (filter (const false) ex2)
     test "filter by key" $
       Assert.equal (delete 20 ex2) (filterWithKey (\i _ -> i /= 20) ex2)
-    Internal.testAll
+
+props = do
+  test "insert then delete identity"
+    $ quickCheck \(TIntMap m) k s -> delete k (insert k s m) === m
+  test "insert then lookup hits"
+    $ quickCheck \(TIntMap m) k s -> lookup k (insert k s m) === Just s
+  test "delete then lookup misses"
+    $ quickCheck \(TIntMap m) k -> lookup k (delete k m) === Nothing
+  test "filter - keep all"
+    $ quickCheck \(TIntMap m) -> filter (const true) m === m
+  test "filter - drop all"
+    $ quickCheck \(TIntMap m) -> filter (const false) m === empty
+
+newtype TIntMap = TIntMap (IntMap String)
+
+runTIntMap :: TIntMap -> IntMap String
+runTIntMap (TIntMap t) = t
+
+instance arbitraryTIntMap :: Arbitrary TIntMap where
+  arbitrary = (TIntMap <<< fromAssocArray) <$> arbitrary
+
+instance showTIntMap :: Show TIntMap where
+  show (TIntMap t) = show t
