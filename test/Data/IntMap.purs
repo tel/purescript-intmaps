@@ -1,15 +1,14 @@
-
 module Test.Data.IntMap where
 
-import           Data.Foldable             (foldMap, foldr, foldl)
+import Data.Foldable (foldMap, foldr, foldl)
 import Data.Array ((:))
-import           Data.IntMap
-import           Data.Maybe
-import           Prelude
-import qualified Test.Data.IntMap.Internal as Internal
-import           Test.Unit                 (Test (), test)
-import           Test.Unit.Assert          as Assert
+import Data.Maybe (Maybe(Just, Nothing))
+import Prelude ((/=), ($), (#), bind, const, eq, pure)
+import Test.Data.IntMap.Internal as Internal
+import Test.Unit (Test (), test)
+import Test.Unit.Assert as Assert
 
+import Data.IntMap
 
 ex0 :: IntMap Int
 ex0 = empty 

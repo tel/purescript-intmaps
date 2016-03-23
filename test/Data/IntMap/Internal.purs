@@ -1,12 +1,14 @@
-
 module Test.Data.IntMap.Internal where
 
-import           Data.Function        (runFn2)
-import           Data.Int.Bits
-import           Data.IntMap.Internal
-import           Prelude
-import           Test.Unit            (Test (), test)
-import           Test.Unit.Assert     as Assert
+import Data.Function (runFn2)
+import Data.Int.Bits (complement, (.&.), (.^.))
+import Data.IntMap.Internal (
+  Mask(Mask), dec2bin, bin2dec
+, branchingBit, _mask, highestBit, pow
+)
+import Prelude (($), (-), bind)
+import Test.Unit (Test (), test)
+import Test.Unit.Assert as Assert
 
 tests :: Test ()
 tests = do
