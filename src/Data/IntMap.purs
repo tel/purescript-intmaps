@@ -41,6 +41,8 @@ module Data.IntMap (
   , differenceWith
   , differenceWithKey
 
+  , mergeWithKey
+
   , unionWith
   , unionLeft
   , unionRight
