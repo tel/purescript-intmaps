@@ -37,6 +37,10 @@ module Data.IntMap (
   , updateWithKey
   , alter
 
+  , difference
+  , differenceWith
+  , differenceWithKey
+
   , unionWith
   , unionLeft
   , unionRight
@@ -64,7 +68,7 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)
 import Data.Tuple (Tuple (Tuple))
-import Prelude (class Applicative, class Eq, class Functor, class Semigroup, class Show, (<*>), (<$>), pure, (+), (<>), show, otherwise, (&&), (==), not, ($), eq, id, append)
+import Prelude
 
 -- Type definition (not exported)
 -- ----------------------------------------------------------------------------
@@ -256,6 +260,26 @@ alter f k t =
       case f Nothing of
         Just a  -> Lf k a
         Nothing -> Empty
+
+-- | /O(n+m)/. Difference between two maps (based on keys).
+difference :: forall a b. IntMap a -> IntMap b -> IntMap a
+difference m1 m2 =
+  mergeWithKey (\_ _ _ -> Nothing) id (const Empty) m1 m2
+
+-- | /O(n+m)/. Difference with a combining function.
+differenceWith :: forall a b. (a -> b -> Maybe a)
+               -> IntMap a -> IntMap b -> IntMap a
+differenceWith f m1 m2 =
+  differenceWithKey (\_ x y -> f x y) m1 m2
+
+-- | /O(n+m)/. Difference with a combining function. When two equal keys
+-- | are encountered, the combining function is applied to the key and
+-- | both values. If it returns 'Nothing', the elements is discarded.
+-- | If it returns (@'Just' y@), the element is updated with a new value @y@.
+differenceWithKey :: forall a b. (Int -> a -> b -> Maybe a)
+                  -> IntMap a -> IntMap b -> IntMap a
+differenceWithKey f m1 m2 =
+  mergeWithKey f id (const Empty) m1 m2
 
 -- | Unions two `IntMap`s together using a splatting function. If
 -- | a key is present in both constituent lists then the resulting
