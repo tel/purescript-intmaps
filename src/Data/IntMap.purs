@@ -1,16 +1,16 @@
 
 -- | An efficient implementation of purely functional maps from integer keys to
 -- values. To be imported qualified.
--- 
+--
 -- Based on the Haskell strict IntMap implementation which is based on
 -- "big-endian patricia trees".
 --
 -- - <https://hackage.haskell.org/package/containers-0.5.7.1/docs/Data-IntMap-Strict.html>
--- - Chris Okasaki and Andy Gill, "Fast Mergeable Integer Maps", 
+-- - Chris Okasaki and Andy Gill, "Fast Mergeable Integer Maps",
 --   - Workshop on ML, September 1998, pages 77-86
 --   - <http://citeseer.ist.psu.edu/okasaki98fast.html>
 
-module Data.IntMap ( 
+module Data.IntMap (
 
     IntMap ()
 
@@ -70,7 +70,7 @@ import Prelude (class Applicative, class Eq, class Functor, class Semigroup, cla
 -- ----------------------------------------------------------------------------
 
 -- | `IntMap a` is the type of finite maps from integers to values at type `a`.
-data IntMap a 
+data IntMap a
   = Empty
   | Lf Int a
   | Br Prefix Mask (IntMap a) (IntMap a)
@@ -119,7 +119,7 @@ singleton k a = Lf k a
 
 -- | Is a given key in the map?
 member :: forall a . Int -> IntMap a -> Boolean
-member k m = 
+member k m =
   case lookup k m of
     Nothing -> false
     Just _ -> true
@@ -138,13 +138,13 @@ lookup k (Br prefix m l r)
 
 -- | Like `lookup` but returning a default value if not available in the `IntMap`
 lookupDefault :: forall a . Int -> a -> IntMap a -> a
-lookupDefault k d m = 
+lookupDefault k d m =
   case lookup k m of
     Nothing -> d
     Just a -> a
 
--- | Update an `IntMap` by ensuring that a given value exists at a given 
--- | key such that for any `IntMap` `m` and integer `k`, 
+-- | Update an `IntMap` by ensuring that a given value exists at a given
+-- | key such that for any `IntMap` `m` and integer `k`,
 -- |
 -- |   lookup k (insert k a) = Just a
 -- |
@@ -160,10 +160,10 @@ insert = insertWithKey (\_ _ a -> a)
 insertWith :: forall a . (a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 insertWith splat = insertWithKey (\_ -> splat)
 
--- | Like `insertWith` but the splatting function also has access to the 
+-- | Like `insertWith` but the splatting function also has access to the
 -- | map key where the conflict arose.
 insertWithKey :: forall a . (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
-insertWithKey splat k a t = go t where 
+insertWithKey splat k a t = go t where
   go t =
     case t of
       Empty -> Lf k a
@@ -171,8 +171,8 @@ insertWithKey splat k a t = go t where
         | k0 == k -> Lf k0 (splat k a0 a) -- same key, merge with splat
         | otherwise -> join k (Mask 0) (Lf k a) k0 (Mask 0) t
       Br p m l r
-        | matchPrefix p m k -> 
-          if branchLeft m k 
+        | matchPrefix p m k ->
+          if branchLeft m k
              then Br p m (go l) r
              else Br p m l (go r)
         | otherwise -> join k (Mask 0) (Lf k a) (prefixAsKey p) m t
@@ -260,7 +260,7 @@ alter f k t =
 -- | Unions two `IntMap`s together using a splatting function. If
 -- | a key is present in both constituent lists then the resulting
 -- | list will be the splat of the values from each constituent. If the key
--- | was available in only one constituent then it is available unmodified 
+-- | was available in only one constituent then it is available unmodified
 -- | in the result.
 unionWith :: forall a . (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 unionWith splat = unionWithKey (\_ -> splat)
@@ -312,7 +312,7 @@ unionWithKey splat = go where
 -- | Transform all of the values in the map.
 mapWithKey :: forall a b . (Int -> a -> b) -> IntMap a -> IntMap b
 mapWithKey f = go where
-  go m = 
+  go m =
     case m of
       Empty -> Empty
       Lf k a -> Lf k (f k a)
