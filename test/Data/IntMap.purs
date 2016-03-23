@@ -26,7 +26,6 @@ ex2 = empty
      >| insert 30 30
      >| insert 0  1234
 
-tests :: Test ()
 tests = do
   test "Data.IntMap" do 
     test "lookup in empty map" $ Assert.equal Nothing (lookup 0 ex0)
@@ -49,4 +48,4 @@ tests = do
       Assert.equal empty (filter (const false) ex2)
     test "filter by key" $
       Assert.equal (delete 20 ex2) (filterWithKey (\i _ -> i /= 20) ex2)
-    Internal.tests
+    Internal.testAll
