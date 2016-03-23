@@ -10,10 +10,16 @@ import Prelude (class Ord, class Eq, (*), (-), otherwise, (==), (<), compare, eq
 
 newtype Prefix = Prefix Int
 
+runPrefix :: Prefix -> Int
+runPrefix (Prefix i) = i
+
 instance prefixEq :: Eq Prefix where
   eq (Prefix a) (Prefix b) = eq a b
 
 newtype Mask = Mask Int
+
+runMask :: Mask -> Int
+runMask (Mask i) = i
 
 instance maskEq :: Eq Mask where
   eq (Mask a) (Mask b) = eq a b

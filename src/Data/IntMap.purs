@@ -59,7 +59,7 @@ module Data.IntMap (
   ) where
 
 import Data.Foldable (class Foldable, foldMap, foldl)
-import Data.IntMap.Internal (Prefix(Prefix), Mask(Mask), mask, branchLeft, branchingBit', prefixAsKey, matchPrefix, maskLonger, branchMask)
+import Data.IntMap.Internal (Prefix(Prefix), Mask(Mask), mask, branchLeft, branchingBit', prefixAsKey, matchPrefix, maskLonger, branchMask, runMask, runPrefix)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)
@@ -308,6 +308,77 @@ unionWithKey splat = go where
       join
         (prefixAsKey l_p) l_m l
         (prefixAsKey r_p) r_m r
+
+mergeWithKey  :: forall a b c.
+                 (Int -> a -> b -> Maybe c)
+                 -> (IntMap a -> IntMap c)
+                 -> (IntMap b -> IntMap c)
+                 -> IntMap a -> IntMap b -> IntMap c
+mergeWithKey f g1 g2 = mergeWithKey' br combine g1 g2
+  where
+    combine (Lf k1 x1) (Lf _ x2) =
+      case f k1 x1 x2 of
+        Nothing -> Empty
+        Just x -> Lf k1 x
+    combine _ _ = Empty -- TODO! proove that this cannot happen!
+
+
+mergeWithKey' :: forall a b c.
+                 (Prefix -> Mask -> IntMap c -> IntMap c -> IntMap c)
+                 -> (IntMap a -> IntMap b -> IntMap c)
+                 -> (IntMap a -> IntMap c) -> (IntMap b -> IntMap c)
+                 -> IntMap a -> IntMap b -> IntMap c
+mergeWithKey' br' f g1 g2 = go
+  where
+    go t1@(Br p1 m1 l1 r1) t2@(Br p2 m2 l2 r2) = go'
+      where
+        go'
+          | maskLonger m1 m2 = merge2
+          | maskLonger m2 m1 = merge1
+          | p1 == p2         = br' p1 m2 (go l1 l2) (go r1 r2)
+          | otherwise        = maybe_link p1k (g1 t1) p2k (g2 t2)
+        p1k = runPrefix p1
+        p2k = runPrefix p2
+        p1m = Mask p1k
+        p2m = Mask p2k
+        m1k = runMask m1
+        m2k = runMask m2
+        merge1 | not (matchPrefix p2 p1m m1k) = maybe_link p1k (g1 t1) p2k (g2 t2)
+               | branchLeft m1 p2k            = br' p1 m1 (go l1 t2) (g1 r1)
+               | otherwise                    = br' p1 m1 (g1 l1) (go r1 t2)
+        merge2 | not (matchPrefix p1 p2m m2k) = maybe_link p1k (g1 t1) p2k (g2 t2)
+               | branchLeft m2 p1k            = br' p2 m2 (go t1 l2) (g2 r2)
+               | otherwise                    = br' p2 m2 (g2 l2) (go t1 r2)
+
+    go t1'@(Br _ _ _ _) t2'@(Lf k2' _) = merge t2' k2' t1'
+      where
+        merge t2 k2 t1@(Br p1 m1 l1 r1)
+          | not (matchPrefix p1 m1 k2) = maybe_link (runPrefix p1) (g1 t1) k2 (g2 t2)
+          | branchLeft m1 k2 = br' p1 m1 (merge t2 k2 l1) (g1 r1)
+          | otherwise  = br' p1 m1 (g1 l1) (merge t2 k2 r1)
+        merge t2 k2 t1@(Lf k1 _)
+          | k1 == k2 = f t1 t2
+          | otherwise = maybe_link k1 (g1 t1) k2 (g2 t2)
+        merge t2 _  Empty = g2 t2
+
+    go t1@(Br _ _ _ _) Empty = g1 t1
+
+    go t1'@(Lf k1' _) t2' = merge t1' k1' t2'
+      where
+        merge t1 k1 t2@(Br p2 m2 l2 r2)
+          | not (matchPrefix p2 m2 k1) = maybe_link k1 (g1 t1) (runPrefix p2) (g2 t2)
+          | branchLeft m2 k1 = br' p2 m2 (merge t1 k1 l2) (g2 r2)
+          | otherwise  = br' p2 m2 (g2 l2) (merge t1 k1 r2)
+        merge t1 k1 t2@(Lf k2 _)
+          | k1 == k2 = f t1 t2
+          | otherwise = maybe_link k1 (g1 t1) k2 (g2 t2)
+        merge t1 _  Empty = g1 t1
+
+    go Empty t2 = g2 t2
+
+    maybe_link _ Empty _ t2 = t2
+    maybe_link _ t1 _ Empty = t1
+    maybe_link p1 t1 p2 t2  = link p1 t1 p2 t2
 
 -- | Transform all of the values in the map.
 mapWithKey :: forall a b . (Int -> a -> b) -> IntMap a -> IntMap b
