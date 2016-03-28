@@ -86,7 +86,7 @@ props = do
     $ quickCheck \(TIntMap m) -> filter (const true) m === m
   test "filter - drop all"
     $ quickCheck \(TIntMap m) -> filter (const false) m === empty
-  test "difference - with itself is null"
+  test "difference - with itself is empty"
     $ quickCheck \(TIntMap m) -> difference m m === empty
   test "difference - definition"
     $ quickCheck \(TIntMap m1) (TIntMap m2) ->
