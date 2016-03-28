@@ -1,17 +1,14 @@
-
 module Test.Data.IntMap where
 
-import           Data.Foldable             (foldMap, foldr, foldl)
+import Data.Foldable (foldMap, foldr, foldl)
 import Data.Array ((:))
-import           Data.IntMap
-import           Data.Maybe
-import           Prelude
-import qualified Test.Data.IntMap.Internal as Internal
-import           Test.Unit                 (Test (), test)
-import           Test.Unit.Assert          as Assert
+import Data.Maybe (Maybe(Just, Nothing))
+import Prelude ((/=), ($), (#), bind, const, eq, pure)
+import Test.Data.IntMap.Internal as Internal
+import Test.Unit (Test (), test)
+import Test.Unit.Assert as Assert
 
-(>|) :: forall a b . a -> (a -> b) -> b
-(>|) a f = f a
+import Data.IntMap
 
 ex0 :: IntMap Int
 ex0 = empty 
@@ -21,10 +18,10 @@ ex1 = singleton 0 1234
 
 ex2 :: IntMap Int
 ex2 = empty
-     >| insert 10 10
-     >| insert 20 20
-     >| insert 30 30
-     >| insert 0  1234
+      # insert 10 10
+      # insert 20 20
+      # insert 30 30
+      # insert 0  1234
 
 tests :: Test ()
 tests = do
