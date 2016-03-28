@@ -1,6 +1,6 @@
 module Test.Data.IntMap where
 
-import Data.Foldable (foldMap, foldr, foldl)
+import Data.Foldable (foldMap, foldr, foldl, elem)
 import Data.Array ((:))
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(Just, Nothing), maybe)
@@ -13,7 +13,7 @@ import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Prelude (
   class Show, show
 , (+), (/=), ($), (#), (<$>), (<<<)
-, map, bind, const, eq, pure)
+, map, bind, const, eq, pure, not)
 import Data.IntMap
 
 ex0 :: IntMap Int
@@ -86,6 +86,12 @@ props = do
     $ quickCheck \(TIntMap m) -> filter (const true) m === m
   test "filter - drop all"
     $ quickCheck \(TIntMap m) -> filter (const false) m === empty
+  test "difference - with itself is null"
+    $ quickCheck \(TIntMap m) -> difference m m === empty
+  test "difference - definition"
+    $ quickCheck \(TIntMap m1) (TIntMap m2) ->
+    let is = indices m2
+    in difference m1 m2 === filterWithKey (\k _ -> not (k `elem` is)) m1
 
 newtype TIntMap = TIntMap (IntMap String)
 
