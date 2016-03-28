@@ -493,7 +493,7 @@ traverseWithKey inj = go where
 -- ----------------------------------------------------------------------------
 
 -- | Smart branch constructor. Compresses empty trees away.
-br :: forall a . Prefix -> Mask -> IntMap a -> IntMap a -> IntMap a
+br :: forall a. Prefix -> Mask -> IntMap a -> IntMap a -> IntMap a
 br _ _ Empty Empty = Empty
 br _ _ Empty t = t
 br _ _ t Empty = t
