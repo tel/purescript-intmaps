@@ -1,14 +1,14 @@
-
 module Test.Main where
 
-import           Control.Monad.Aff.AVar (AVAR ())
-import           Control.Monad.Eff
-import           Control.Monad.Eff.Random (RANDOM ())
-import           Prelude
-import qualified Test.Data.IntMap       as IntMap
-import           Test.Data.IntMap.Internal as IntMapInternal
-import           Test.Unit              (TIMER (), runTest, test)
-import           Test.Unit.Console      (TESTOUTPUT ())
+import Control.Monad.Aff.AVar (AVAR ())
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Random (RANDOM ())
+import Prelude (Unit, bind)
+import Test.Unit (TIMER (), runTest)
+import Test.Unit.Console (TESTOUTPUT ())
+
+import Test.Data.IntMap as IntMap
+import Test.Data.IntMap.Internal as IntMapInternal
 
 main :: Eff (testOutput :: TESTOUTPUT, avar :: AVAR, timer :: TIMER, random :: RANDOM) Unit
 main = runTest do

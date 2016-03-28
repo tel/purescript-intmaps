@@ -65,7 +65,11 @@ module Data.IntMap (
   ) where
 
 import Data.Foldable (class Foldable, foldMap, foldl)
-import Data.IntMap.Internal (Prefix(Prefix), Mask(Mask), mask, branchLeft, branchingBit', prefixAsKey, matchPrefix, maskLonger, branchMask, runMask, runPrefix)
+import Data.IntMap.Internal (
+  Prefix(Prefix), Mask(Mask), mask, branchLeft, branchingBit'
+, prefixAsKey, matchPrefix, maskLonger, runPrefix, runMask
+, branchMask
+)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)

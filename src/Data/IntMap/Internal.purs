@@ -3,7 +3,7 @@ module Data.IntMap.Internal where
 
 import Data.Function (Fn2 (), runFn2)
 import Data.Int.Bits ((.^.), complement, (.&.), (.|.), zshr)
-import Prelude (class Ord, class Eq, (*), (-), otherwise, (==), (<), compare, eq)
+import Prelude
 
 -- Newtypes
 ----------------------------------------------------------------------------

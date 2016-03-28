@@ -1,22 +1,20 @@
-
 module Test.Data.IntMap where
 
-import           Data.Foldable             (foldMap, foldr, foldl)
+import Data.Foldable (foldMap, foldr, foldl)
 import Data.Array ((:))
-import           Data.IntMap
-import           Data.Maybe
 import Data.Tuple (Tuple(Tuple))
-import           Prelude
-import qualified Test.Data.IntMap.Internal as Internal
-import           Test.Unit                 (Test (), test)
-import           Test.Unit.Assert          as Assert
-import Data.Tuple (Tuple(Tuple))
+import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Test.Data.IntMap.Internal as Internal
+import Test.Unit (Test (), test)
+import Test.Unit.Assert as Assert
 import Test.Unit.QuickCheck (quickCheck)
 import Test.QuickCheck (Result(), (===))
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
-
-(>|) :: forall a b . a -> (a -> b) -> b
-(>|) a f = f a
+import Prelude (
+  class Show, show
+, (+), (/=), ($), (#), (<$>), (<<<)
+, map, bind, const, eq, pure)
+import Data.IntMap
 
 ex0 :: IntMap Int
 ex0 = empty
@@ -26,10 +24,10 @@ ex1 = singleton 0 1234
 
 ex2 :: IntMap Int
 ex2 = empty
-     >| insert 10 10
-     >| insert 20 20
-     >| insert 30 30
-     >| insert 0  1234
+      # insert 10 10
+      # insert 20 20
+      # insert 30 30
+      # insert 0  1234
 
 testAll = test "Data.IntMap" do
   test "Unit Tests" tests
