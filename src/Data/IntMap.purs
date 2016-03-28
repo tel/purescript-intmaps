@@ -346,7 +346,7 @@ mergeWithKey f g1 g2 = mergeWithKey' br combine g1 g2
       case f k1 x1 x2 of
         Nothing -> Empty
         Just x -> Lf k1 x
-    combine _ _ = Empty -- TODO! proove that this cannot happen!
+    combine _ _ = Empty -- TODO! prove that this cannot happen!
 
 
 mergeWithKey' :: forall a b c.
