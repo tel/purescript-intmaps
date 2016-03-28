@@ -28,6 +28,7 @@ tests = do
         Assert.equal "10000" (dec2bin (highestBit (bin2dec "10100") 1))
         Assert.equal "10000" (binBranchingBit "01010101" "01000001")
       Assert.equal "1000000" (dec2bin $ highestBit (bin2dec "1010101") (bin2dec "00000000001"))
+    testHighestBitMask
 
 testInversionTrick :: Test ()
 testInversionTrick =
@@ -43,3 +44,13 @@ binBranchingBit :: String -> String -> String
 binBranchingBit s1 s2 =
   case branchingBit (bin2dec s1) (bin2dec s2) of
     Mask b -> dec2bin b
+
+testHighestBitMask :: Test ()
+testHighestBitMask =
+  test "highest bit mask" do
+    eq "000000" "000000"
+    eq "000001" "000001"
+    eq "000010" "000011"
+    eq "010000" "010110"
+    eq "100000" "100101"
+  where eq m k = Assert.equal (bin2dec m) (highestBitMask $ bin2dec k)

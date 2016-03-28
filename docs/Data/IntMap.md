@@ -143,6 +143,19 @@ updateWithKey :: forall a. (Int -> a -> Maybe a) -> Int -> IntMap a -> IntMap a
 at @k@ (if it is in the map). If (@f k x@) is 'Nothing', the element is
 deleted. If it is (@'Just' y@), the key @k@ is bound to the new value @y@.
 
+#### `alter`
+
+``` purescript
+alter :: forall a. (Maybe a -> Maybe a) -> Int -> IntMap a -> IntMap a
+```
+
+/O(min(n,W))/. The expresion (@'alter' f k m@) alters the value @x@
+at key @k@, or absence thereof.
+'alter' can be used to insert, delete, or update the value under given
+key in the 'IntMap'.
+The following property holds:
+@'lookup' k ('alter' f k m) = f ('lookup' k m)@.
+
 #### `unionWith`
 
 ``` purescript

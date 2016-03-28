@@ -35,6 +35,7 @@ module Data.IntMap (
   , adjustWithKey
   , update
   , updateWithKey
+  , alter
 
   , unionWith
   , unionLeft
@@ -58,10 +59,7 @@ module Data.IntMap (
   ) where
 
 import Data.Foldable (class Foldable, foldMap, foldl)
-import Data.IntMap.Internal (
-  Prefix, Mask(Mask), mask, branchLeft, branchingBit'
-, prefixAsKey, matchPrefix, maskLonger
-)
+import Data.IntMap.Internal (Prefix(Prefix), Mask(Mask), mask, branchLeft, branchingBit', prefixAsKey, matchPrefix, maskLonger, branchMask)
 import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)
@@ -229,8 +227,38 @@ updateWithKey f k t = go t where
         | branchLeft m k -> br p m (go l) r
         | otherwise -> br p m l (go r)
 
--- | Unions two `IntMap`s together using a splatting function. If 
--- | a key is present in both constituent lists then the resulting 
+-- | /O(min(n,W))/. The expresion (@'alter' f k m@) alters the value @x@
+-- | at key @k@, or absence thereof.
+-- | 'alter' can be used to insert, delete, or update the value under given
+-- | key in the 'IntMap'.
+-- | The following property holds:
+-- | @'lookup' k ('alter' f k m) = f ('lookup' k m)@.
+alter :: forall a. (Maybe a -> Maybe a) -> Int -> IntMap a -> IntMap a
+alter f k t =
+  case t of
+    Br p@(Prefix p') m l r
+      | not (matchPrefix p m k) ->
+        case f Nothing of
+          Nothing -> t
+          Just a  -> link k (Lf k a) p' t
+      | branchLeft m k -> br p m (alter f k l) r
+      | otherwise      -> br p m l (alter f k r)
+    Lf ky y
+      | k == ky ->
+        case f (Just y) of
+          Just x  -> Lf ky x
+          Nothing -> Empty
+      | otherwise ->
+        case f Nothing of
+          Just x  -> link k (Lf k x) ky t
+          Nothing -> Lf ky y
+    Empty ->
+      case f Nothing of
+        Just a  -> Lf k a
+        Nothing -> Empty
+
+-- | Unions two `IntMap`s together using a splatting function. If
+-- | a key is present in both constituent lists then the resulting
 -- | list will be the splat of the values from each constituent. If the key
 -- | was available in only one constituent then it is available unmodified 
 -- | in the result.
@@ -381,3 +409,12 @@ join k1 m1 t1 k2 m2 t2 =
    in if branchLeft m k1
          then Br (mask m k1) m t1 t2
          else Br (mask m k1) m t2 t1
+
+link :: forall a. Int -> IntMap a -> Int -> IntMap a -> IntMap a
+link k1 t1 k2 t2 =
+  if branchLeft m k1
+  then Br p m t1 t2
+  else Br p m t2 t1
+  where
+    m = branchMask k1 k2
+    p = mask m k1

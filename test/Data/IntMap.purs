@@ -2,11 +2,13 @@ module Test.Data.IntMap where
 
 import Data.Foldable (foldMap, foldr, foldl)
 import Data.Array ((:))
-import Data.Maybe (Maybe(Just, Nothing))
-import Prelude ((/=), ($), (#), bind, const, eq, pure)
-import Test.Data.IntMap.Internal as Internal
-import Test.Unit (Test (), test)
-import Test.Unit.Assert as Assert
+import           Data.IntMap
+import           Data.Maybe
+import           Prelude
+import qualified Test.Data.IntMap.Internal as Internal
+import           Test.Unit                 (Test (), test)
+import           Test.Unit.Assert          as Assert
+import Data.Tuple (Tuple(Tuple))
 
 import Data.IntMap
 
@@ -46,4 +48,28 @@ tests = do
       Assert.equal empty (filter (const false) ex2)
     test "filter by key" $
       Assert.equal (delete 20 ex2) (filterWithKey (\i _ -> i /= 20) ex2)
+    testAlter
     Internal.tests
+
+testAlter :: Test ()
+testAlter = do
+  test "alter" do
+    test "adding" do
+       Assert.equal (singleton 1 10) (alterIns 10 1 empty)
+       Assert.equal (singleton 1 10) (alterIns 10 1 (singleton 1 10))
+       Assert.equal (fromAssocArray [Tuple 1 10, Tuple 2 20, Tuple 3 30])
+         (alterIns 20 2 (fromAssocArray [Tuple 1 10, Tuple 3 30]))
+    test "deleting" do
+      Assert.equal empty (alterDel 1 empty)
+      Assert.equal empty (alterDel 1 (singleton 1 10))
+      Assert.equal (singleton 2 20) (alterDel 1 (singleton 2 20))
+      Assert.equal (singleton 2 20) (alterDel 1 (fromAssocArray [Tuple 1 10, Tuple 2 20]))
+    test "updating" do
+      Assert.equal empty (alterUpd 1 empty)
+      Assert.equal (singleton 2 20) (alterUpd 1 (singleton 2 20))
+      Assert.equal (fromAssocArray [Tuple 1 10, Tuple 2 21, Tuple 3 30])
+        (alterUpd 2 (fromAssocArray [Tuple 1 10, Tuple 2 20, Tuple 3 30]))
+  where
+    alterIns a = alter (maybe (Just a) Just)
+    alterDel   = alter (const Nothing)
+    alterUpd   = alter (map (_ + 1))

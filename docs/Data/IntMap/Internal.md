@@ -79,6 +79,18 @@ branchingBit' :: Int -> Mask -> Int -> Mask -> Mask
 branchingBit :: Int -> Int -> Mask
 ```
 
+#### `branchMask`
+
+``` purescript
+branchMask :: Int -> Int -> Mask
+```
+
+#### `highestBitMask`
+
+``` purescript
+highestBitMask :: Int -> Int
+```
+
 #### `dec2bin`
 
 ``` purescript
