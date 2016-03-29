@@ -8,7 +8,7 @@ exports.dec2bin = function dec2bin(dec) {
 }
 
 exports.bin2dec = function bin2dec(bin) {
-  return parseInt(bin, 2);
+  return parseInt(bin, 2) >> 0;
 }
 
 exports.pow = Math.pow;

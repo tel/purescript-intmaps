@@ -3,17 +3,23 @@ module Data.IntMap.Internal where
 
 import Data.Function (Fn2 (), runFn2)
 import Data.Int.Bits ((.^.), complement, (.&.), (.|.), zshr)
-import Prelude (class Ord, class Eq, (*), (-), otherwise, (==), (<), compare, eq)
+import Prelude
 
 -- Newtypes
 ----------------------------------------------------------------------------
 
 newtype Prefix = Prefix Int
 
+runPrefix :: Prefix -> Int
+runPrefix (Prefix i) = i
+
 instance prefixEq :: Eq Prefix where
   eq (Prefix a) (Prefix b) = eq a b
 
 newtype Mask = Mask Int
+
+runMask :: Mask -> Int
+runMask (Mask i) = i
 
 instance maskEq :: Eq Mask where
   eq (Mask a) (Mask b) = eq a b
@@ -46,12 +52,12 @@ _mask m k = (k .|. (m-1)) .&. complement m
 highestBit :: Int -> Int -> Int
 highestBit x m = highb (x .&. complement (m - 1)) m where
   highb :: Int -> Int -> Int
-  highb x m 
+  highb x m
     | x == m = m
     | otherwise = highb (x .&. complement m) (2 * m)
 
 branchingBit' :: Int -> Mask -> Int -> Mask -> Mask
-branchingBit' k1 (Mask m1) k2 (Mask m2) = 
+branchingBit' k1 (Mask m1) k2 (Mask m2) =
   Mask (highestBit (k1 .^. k2) (runFn2 max 1 (2 * runFn2 max m1 m2)))
 
 branchingBit :: Int -> Int -> Mask
