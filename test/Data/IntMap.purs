@@ -8,7 +8,7 @@ import Test.Data.IntMap.Internal as Internal
 import Test.Unit (Test (), test)
 import Test.Unit.Assert as Assert
 import Test.Unit.QuickCheck (quickCheck)
-import Test.QuickCheck (Result(), (===))
+import Test.QuickCheck ((===))
 import Test.QuickCheck.Arbitrary (class Arbitrary, arbitrary)
 import Prelude (
   class Show, show
