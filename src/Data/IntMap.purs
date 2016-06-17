@@ -74,7 +74,7 @@ import Data.Maybe (Maybe(Nothing, Just))
 import Data.Monoid (class Monoid, mempty)
 import Data.Traversable (class Traversable)
 import Data.Tuple (Tuple (Tuple))
-import Prelude
+import Prelude hiding (join)
 
 -- Type definition (not exported)
 -- ----------------------------------------------------------------------------
