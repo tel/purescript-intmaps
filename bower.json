@@ -14,7 +14,8 @@
   "dependencies": {
     "purescript-functions": "^1.0.0",
     "purescript-integers": "^1.0.0",
-    "purescript-foldable-traversable": "^1.0.0"
+    "purescript-foldable-traversable": "^1.0.0",
+    "purescript-tuples": "^1.0.0"
   },
   "devDependencies": {
     "purescript-quickcheck": "^1.0.0",
