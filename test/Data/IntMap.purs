@@ -30,10 +30,12 @@ ex2 = empty
       # insert 30 30
       # insert 0  1234
 
+testAll :: forall e. TestSuite (random :: RANDOM | e)
 testAll = suite "Data.IntMap" do
   suite "Unit Tests" tests
   suite "QuickCheck" props
 
+tests :: forall e. TestSuite e
 tests = do
     test "lookup in empty map" $ Assert.equal Nothing (lookup 0 ex0)
     test "lookup in singleton map" $ Assert.equal (Just 1234) (lookup 0 ex1)
@@ -54,6 +56,7 @@ tests = do
     testAlter
     Internal.tests
 
+testAlter :: forall e. TestSuite e
 testAlter = do
   suite "alter" do
     test "adding" do
@@ -76,6 +79,7 @@ testAlter = do
     alterDel   = alter (const Nothing)
     alterUpd   = alter (map (_ + 1))
 
+props :: forall e. TestSuite (random :: RANDOM | e)
 props = do
   test "insert then delete identity"
     $ quickCheck \(TIntMap m) k s -> delete k (insert k s m) === m

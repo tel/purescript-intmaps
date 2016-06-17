@@ -13,14 +13,17 @@ import Test.Unit.Assert as Assert
 import Test.Unit.QuickCheck (quickCheck)
 import Test.QuickCheck (Result (), (===))
 
+testAll :: forall e. TestSuite (random :: RANDOM | e)
 testAll = suite "Data.IntMap.Internal" do
   suite "QuickCheck" props
   suite "Unit Tests" tests
 
+props :: forall e. TestSuite (random :: RANDOM | e)
 props = do
   test "binary conversion identity" do
     quickCheck propBinConvIdentity
 
+tests :: forall e. TestSuite e
 tests = do
     test "binary conversions" do
       let minInt = (-2147483648)
@@ -42,6 +45,7 @@ tests = do
         Assert.equal "1000000" (dec2bin $ highestBit (bin2dec "1010101") (bin2dec "00000000001"))
     testHighestBitMask
 
+testInversionTrick :: forall e. TestSuite e
 testInversionTrick =
   test "inversion trick" do
     let x  = bin2dec "10101010101010101"
@@ -56,6 +60,7 @@ binBranchingBit s1 s2 =
   case branchingBit (bin2dec s1) (bin2dec s2) of
     Mask b -> dec2bin b
 
+testHighestBitMask :: forall e. TestSuite e
 testHighestBitMask =
   test "highest bit mask" do
     eq "000000" "000000"
