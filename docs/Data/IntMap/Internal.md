@@ -12,6 +12,12 @@ newtype Prefix
 Eq Prefix
 ```
 
+#### `runPrefix`
+
+``` purescript
+runPrefix :: Prefix -> Int
+```
+
 #### `Mask`
 
 ``` purescript
@@ -23,6 +29,12 @@ newtype Mask
 ``` purescript
 Eq Mask
 Ord Mask
+```
+
+#### `runMask`
+
+``` purescript
+runMask :: Mask -> Int
 ```
 
 #### `maskLonger`

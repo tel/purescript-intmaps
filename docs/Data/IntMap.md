@@ -68,8 +68,8 @@ Like `lookup` but returning a default value if not available in the `IntMap`
 insert :: forall a. Int -> a -> IntMap a -> IntMap a
 ```
 
-Update an `IntMap` by ensuring that a given value exists at a given 
-key such that for any `IntMap` `m` and integer `k`, 
+Update an `IntMap` by ensuring that a given value exists at a given
+key such that for any `IntMap` `m` and integer `k`,
 
   lookup k (insert k a) = Just a
 
@@ -93,7 +93,7 @@ the previous value if it exists and the second the new one.
 insertWithKey :: forall a. (Int -> a -> a -> a) -> Int -> a -> IntMap a -> IntMap a
 ```
 
-Like `insertWith` but the splatting function also has access to the 
+Like `insertWith` but the splatting function also has access to the
 map key where the conflict arose.
 
 #### `delete`
@@ -156,16 +156,43 @@ key in the 'IntMap'.
 The following property holds:
 @'lookup' k ('alter' f k m) = f ('lookup' k m)@.
 
+#### `difference`
+
+``` purescript
+difference :: forall a b. IntMap a -> IntMap b -> IntMap a
+```
+
+/O(n+m)/. Difference between two maps (based on keys).
+
+#### `differenceWith`
+
+``` purescript
+differenceWith :: forall a b. (a -> b -> Maybe a) -> IntMap a -> IntMap b -> IntMap a
+```
+
+/O(n+m)/. Difference with a combining function.
+
+#### `differenceWithKey`
+
+``` purescript
+differenceWithKey :: forall a b. (Int -> a -> b -> Maybe a) -> IntMap a -> IntMap b -> IntMap a
+```
+
+/O(n+m)/. Difference with a combining function. When two equal keys
+are encountered, the combining function is applied to the key and
+both values. If it returns 'Nothing', the elements is discarded.
+If it returns (@'Just' y@), the element is updated with a new value @y@.
+
 #### `unionWith`
 
 ``` purescript
 unionWith :: forall a. (a -> a -> a) -> IntMap a -> IntMap a -> IntMap a
 ```
 
-Unions two `IntMap`s together using a splatting function. If 
-a key is present in both constituent lists then the resulting 
+Unions two `IntMap`s together using a splatting function. If
+a key is present in both constituent lists then the resulting
 list will be the splat of the values from each constituent. If the key
-was available in only one constituent then it is available unmodified 
+was available in only one constituent then it is available unmodified
 in the result.
 
 #### `unionLeft`
@@ -194,6 +221,12 @@ unionWithKey :: forall a. (Int -> a -> a -> a) -> IntMap a -> IntMap a -> IntMap
 
 Like `unionWith` but where the splatting function has access to all of the
 keys where conflicts arise.
+
+#### `mergeWithKey`
+
+``` purescript
+mergeWithKey :: forall a b c. (Int -> a -> b -> Maybe c) -> (IntMap a -> IntMap c) -> (IntMap b -> IntMap c) -> IntMap a -> IntMap b -> IntMap c
+```
 
 #### `mapWithKey`
 
@@ -254,7 +287,7 @@ Gather all of the values stored in an `IntMap`
 #### `foldMapWithKey`
 
 ``` purescript
-foldMapWithKey :: forall a m. (Monoid m) => (Int -> a -> m) -> IntMap a -> m
+foldMapWithKey :: forall a m. Monoid m => (Int -> a -> m) -> IntMap a -> m
 ```
 
 A version of `foldMap` which provides key values during the mapping.
@@ -310,7 +343,7 @@ Count the number of values in the `IntMap`
 #### `traverseWithKey`
 
 ``` purescript
-traverseWithKey :: forall a t b. (Applicative t) => (Int -> a -> t b) -> IntMap a -> t (IntMap b)
+traverseWithKey :: forall a t b. Applicative t => (Int -> a -> t b) -> IntMap a -> t (IntMap b)
 ```
 
 
