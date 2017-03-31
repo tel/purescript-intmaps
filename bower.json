@@ -12,13 +12,13 @@
     "output"
   ],
   "dependencies": {
-    "purescript-functions": "~0.1.0",
-    "purescript-integers": "~0.2.1",
-    "purescript-foldable-traversable": "~0.4.2"
+    "purescript-functions": "^2.0.0",
+    "purescript-integers": "^2.1.1",
+    "purescript-foldable-traversable": "^2.2.0"
   },
   "devDependencies": {
-    "purescript-quickcheck": "^0.12.2",
-    "purescript-test-unit": "^5.0.0"
+    "purescript-quickcheck": "^3.1.1",
+    "purescript-test-unit": "^10.1.0"
   },
   "repository": {
     "type": "git",

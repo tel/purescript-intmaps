@@ -7,14 +7,14 @@ import Data.IntMap.Internal (
 , highestBitMask
 )
 import Prelude (($), (-), negate, bind, (<<<))
-import Test.Unit (test)
+import Test.Unit (suite, test)
 import Test.Unit.Assert as Assert
 import Test.Unit.QuickCheck (quickCheck)
 import Test.QuickCheck (Result (), (===))
 
-testAll = test "Data.IntMap.Internal" do
-  test "QuickCheck" props
-  test "Unit Tests" tests
+testAll = suite "Data.IntMap.Internal" do
+  suite "QuickCheck" props
+  suite "Unit Tests" tests
 
 props = do
   test "binary conversion identity" do
@@ -32,13 +32,14 @@ tests = do
       Assert.equal 5 (bin2dec "101")
       Assert.equal 90 (bin2dec "01011010")
       Assert.equal 90 (bin2dec "000000001011010")
-    test "bit twiddling assertions" do
+    suite "bit twiddling assertions" do
       testInversionTrick
       test "branching bit" do
         Assert.equal "10100" (dec2bin $ bin2dec "01010101" .^. bin2dec "01000001")
         Assert.equal "10000" (dec2bin (highestBit (bin2dec "10100") 1))
         Assert.equal "10000" (binBranchingBit "01010101" "01000001")
-      Assert.equal "1000000" (dec2bin $ highestBit (bin2dec "1010101") (bin2dec "00000000001"))
+      test "1000000" do
+        Assert.equal "1000000" (dec2bin $ highestBit (bin2dec "1010101") (bin2dec "00000000001"))
     testHighestBitMask
 
 testInversionTrick =

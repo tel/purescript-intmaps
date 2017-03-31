@@ -5,7 +5,7 @@ import Data.Array ((:))
 import Data.Tuple (Tuple(Tuple))
 import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Test.Data.IntMap.Internal as Internal
-import Test.Unit (Test (), test)
+import Test.Unit (Test (), suite, test)
 import Test.Unit.Assert as Assert
 import Test.Unit.QuickCheck (quickCheck)
 import Test.QuickCheck ((===))
@@ -29,9 +29,9 @@ ex2 = empty
       # insert 30 30
       # insert 0  1234
 
-testAll = test "Data.IntMap" do
-  test "Unit Tests" tests
-  test "QuickCheck" props
+testAll = suite "Data.IntMap" do
+  suite "Unit Tests" tests
+  suite "QuickCheck" props
 
 tests = do
     test "lookup in empty map" $ Assert.equal Nothing (lookup 0 ex0)
@@ -54,7 +54,7 @@ tests = do
     Internal.tests
 
 testAlter = do
-  test "alter" do
+  suite "alter" do
     test "adding" do
        Assert.equal (singleton 1 10) (alterIns 10 1 empty)
        Assert.equal (singleton 1 10) (alterIns 10 1 (singleton 1 10))
